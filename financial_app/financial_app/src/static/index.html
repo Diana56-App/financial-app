@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Финансовый учет РПК Сталкер</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'income-bg': '#f0fdf4',
+                        'expense-bg': '#fef2f2',
+                        'accent': '#9d174d',
+                        'accent-dark': '#8b003a',
+                        'text-primary': '#1f2937'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .income-row { background-color: #f0fdf4; }
+        .expense-row { background-color: #fef2f2; }
+        .transfer-row { background-color: #f8fafc; }
+    </style>
+</head>
+<body class="bg-gray-50 text-text-primary">
+    <!-- Навигация -->
+    <nav class="bg-accent text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold">Финансовый учет РПК Сталкер</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="nav-dashboard" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-accent-dark">Дашборд</button>
+                    <button id="nav-transactions" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-accent-dark">Операции</button>
+                    <button id="nav-planned" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-accent-dark">Планирование</button>
+                    <button id="nav-reports" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-accent-dark">Отчеты</button>
+                    <button id="nav-settings" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-accent-dark">Справочники</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Дашборд -->
+        <div id="dashboard-section" class="section">
+            <div class="px-4 py-6 sm:px-0">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Дашборд</h2>
+                
+                <!-- Карточки с основными показателями -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white overflow-hidden shadow rounded-lg">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                        <span class="text-white text-sm font-bold">↑</span>
+                                    </div>
+                                </div>
+                                <div class="ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-gray-500 truncate">Доходы за месяц</dt>
+                                        <dd class="text-lg font-medium text-gray-900" id="monthly-income">0 ₽</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white overflow-hidden shadow rounded-lg">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                                        <span class="text-white text-sm font-bold">↓</span>
+                                    </div>
+                                </div>
+                                <div class="ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-gray-500 truncate">Расходы за месяц</dt>
+                                        <dd class="text-lg font-medium text-gray-900" id="monthly-expense">0 ₽</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white overflow-hidden shadow rounded-lg">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                                        <span class="text-white text-sm font-bold">₽</span>
+                                    </div>
+                                </div>
+                                <div class="ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-gray-500 truncate">Общий баланс</dt>
+                                        <dd class="text-lg font-medium text-gray-900" id="total-balance">0 ₽</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Последние операции -->
+                <div class="bg-white shadow overflow-hidden sm:rounded-md">
+                    <div class="px-4 py-5 sm:px-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Последние операции</h3>
+                    </div>
+                    <ul id="recent-transactions" class="divide-y divide-gray-200">
+                        <!-- Операции будут загружены динамически -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Операции -->
+        <div id="transactions-section" class="section hidden">
+            <div class="px-4 py-6 sm:px-0">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Операции</h2>
+                    <button id="add-transaction-btn" class="bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-md text-sm font-medium">
+                        Добавить операцию
+                    </button>
+                </div>
+
+                <!-- Фильтры -->
+                <div class="bg-white p-4 rounded-lg shadow mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Тип операции</label>
+                            <select id="filter-type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value="">Все</option>
+                                <option value="income">Доход</option>
+                                <option value="expense">Расход</option>
+                                <option value="transfer">Перевод</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Дата от</label>
+                            <input type="date" id="filter-start-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Дата до</label>
+                            <input type="date" id="filter-end-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        </div>
+                        <div class="flex items-end">
+                            <button id="apply-filters" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                                Применить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Список операций -->
+                <div class="bg-white shadow overflow-hidden sm:rounded-md">
+                    <ul id="transactions-list" class="divide-y divide-gray-200">
+                        <!-- Операции будут загружены динамически -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Планирование -->
+        <div id="planned-section" class="section hidden">
+            <div class="px-4 py-6 sm:px-0">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Планирование платежей</h2>
+                    <button id="add-planned-btn" class="bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-md text-sm font-medium">
+                        Добавить плановую операцию
+                    </button>
+                </div>
+
+                <!-- Список плановых операций -->
+                <div class="bg-white shadow overflow-hidden sm:rounded-md">
+                    <ul id="planned-list" class="divide-y divide-gray-200">
+                        <!-- Плановые операции будут загружены динамически -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Отчеты -->
+        <div id="reports-section" class="section hidden">
+            <div class="px-4 py-6 sm:px-0">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Отчеты</h2>
+                
+                <!-- Фильтры для отчетов -->
+                <div class="bg-white p-4 rounded-lg shadow mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Дата от</label>
+                            <input type="date" id="report-start-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Дата до</label>
+                            <input type="date" id="report-end-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        </div>
+                        <div class="flex items-end">
+                            <button id="generate-reports" class="bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-md text-sm font-medium">
+                                Сформировать отчеты
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Отчет по движению денежных средств -->
+                <div class="bg-white p-6 rounded-lg shadow mb-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Движение денежных средств</h3>
+                    <div id="cash-flow-report">
+                        <!-- Отчет будет загружен динамически -->
+                    </div>
+                </div>
+
+                <!-- Отчет по прибылям и убыткам -->
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Прибыли и убытки</h3>
+                    <div id="profit-loss-report">
+                        <!-- Отчет будет загружен динамически -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Справочники -->
+        <div id="settings-section" class="section hidden">
+            <div class="px-4 py-6 sm:px-0">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Справочники</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Счета -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">Счета</h3>
+                            <button id="add-account-btn" class="bg-accent hover:bg-accent-dark text-white px-3 py-1 rounded text-sm">
+                                Добавить
+                            </button>
+                        </div>
+                        <ul id="accounts-list" class="space-y-2">
+                            <!-- Счета будут загружены динамически -->
+                        </ul>
+                    </div>
+
+                    <!-- Направления деятельности -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">Направления деятельности</h3>
+                            <button id="add-direction-btn" class="bg-accent hover:bg-accent-dark text-white px-3 py-1 rounded text-sm">
+                                Добавить
+                            </button>
+                        </div>
+                        <ul id="directions-list" class="space-y-2">
+                            <!-- Направления будут загружены динамически -->
+                        </ul>
+                    </div>
+
+                    <!-- Категории доходов -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">Категории доходов</h3>
+                            <button id="add-income-category-btn" class="bg-accent hover:bg-accent-dark text-white px-3 py-1 rounded text-sm">
+                                Добавить
+                            </button>
+                        </div>
+                        <ul id="income-categories-list" class="space-y-2">
+                            <!-- Категории будут загружены динамически -->
+                        </ul>
+                    </div>
+
+                    <!-- Категории расходов -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">Категории расходов</h3>
+                            <button id="add-expense-category-btn" class="bg-accent hover:bg-accent-dark text-white px-3 py-1 rounded text-sm">
+                                Добавить
+                            </button>
+                        </div>
+                        <ul id="expense-categories-list" class="space-y-2">
+                            <!-- Категории будут загружены динамически -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Модальные окна -->
+    <!-- Модальное окно для добавления операции -->
+    <div id="transaction-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Добавить операцию</h3>
+                <form id="transaction-form">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Тип операции</label>
+                        <select id="transaction-type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+                            <option value="income">Доход</option>
+                            <option value="expense">Расход</option>
+                            <option value="transfer">Перевод</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Сумма</label>
+                        <input type="number" id="transaction-amount" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Дата</label>
+                        <input type="datetime-local" id="transaction-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+                    </div>
+                    <div class="mb-4" id="from-account-group">
+                        <label class="block text-sm font-medium text-gray-700">Счет списания</label>
+                        <select id="from-account" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                            <option value="">Выберите счет</option>
+                        </select>
+                    </div>
+                    <div class="mb-4" id="to-account-group">
+                        <label class="block text-sm font-medium text-gray-700">Счет зачисления</label>
+                        <select id="to-account" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                            <option value="">Выберите счет</option>
+                        </select>
+                    </div>
+                    <div class="mb-4" id="income-category-group">
+                        <label class="block text-sm font-medium text-gray-700">Категория дохода</label>
+                        <select id="income-category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                            <option value="">Выберите категорию</option>
+                        </select>
+                    </div>
+                    <div class="mb-4" id="expense-category-group">
+                        <label class="block text-sm font-medium text-gray-700">Категория расхода</label>
+                        <select id="expense-category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                            <option value="">Выберите категорию</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Направление деятельности</label>
+                        <select id="business-direction" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                            <option value="">Выберите направление</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Комментарий</label>
+                        <textarea id="transaction-description" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" rows="3"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" id="cancel-transaction" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md text-sm font-medium">
+                            Отмена
+                        </button>
+                        <button type="submit" class="bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-md text-sm font-medium">
+                            Сохранить
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
