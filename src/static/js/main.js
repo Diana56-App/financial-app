@@ -46,11 +46,11 @@ async function apiCall(endpoint, options = {}) {
             },
             ...options
         });
-        
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         return await response.json();
     } catch (error) {
         console.error('API call failed:', error);
@@ -123,7 +123,7 @@ async function loadPlannedTransactions() {
 function updateAccountSelects() {
     const fromAccountSelect = document.getElementById('from-account');
     const toAccountSelect = document.getElementById('to-account');
-    
+
     [fromAccountSelect, toAccountSelect].forEach(select => {
         select.innerHTML = '<option value="">Выберите счет</option>';
         accounts.forEach(account => {
@@ -171,7 +171,7 @@ function updateBusinessDirectionSelect() {
 function updateAccountsList() {
     const list = document.getElementById('accounts-list');
     list.innerHTML = '';
-    
+
     accounts.forEach(account => {
         const li = document.createElement('li');
         li.className = 'flex justify-between items-center p-2 bg-gray-50 rounded';
@@ -189,7 +189,7 @@ function updateAccountsList() {
 function updateIncomeCategoriesList() {
     const list = document.getElementById('income-categories-list');
     list.innerHTML = '';
-    
+
     incomeCategories.forEach(category => {
         const li = document.createElement('li');
         li.className = 'p-2 bg-gray-50 rounded';
@@ -201,7 +201,7 @@ function updateIncomeCategoriesList() {
 function updateExpenseCategoriesList() {
     const list = document.getElementById('expense-categories-list');
     list.innerHTML = '';
-    
+
     expenseCategories.forEach(category => {
         const li = document.createElement('li');
         li.className = 'p-2 bg-gray-50 rounded';
@@ -213,7 +213,7 @@ function updateExpenseCategoriesList() {
 function updateBusinessDirectionsList() {
     const list = document.getElementById('directions-list');
     list.innerHTML = '';
-    
+
     businessDirections.forEach(direction => {
         const li = document.createElement('li');
         li.className = 'p-2 bg-gray-50 rounded';
@@ -225,7 +225,7 @@ function updateBusinessDirectionsList() {
 function updateTransactionsList() {
     const list = document.getElementById('transactions-list');
     list.innerHTML = '';
-    
+
     transactions.forEach(transaction => {
         const li = document.createElement('li');
         li.className = `px-4 py-4 ${getTransactionRowClass(transaction.transaction_type)}`;
@@ -600,4 +600,3 @@ document.addEventListener('DOMContentLoaded', function() {
         showSection('dashboard');
     });
 });
-
